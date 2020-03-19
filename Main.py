@@ -4,6 +4,13 @@ from Student import Student
 from DBHelper import Helper
 from InputChecker import Checker
 
+'''
+This main method serves to run instructions concerning the user interface to allow user 
+to interact with StudentDB database.
+Accounts for invalid inputs and commands.
+'''
+
+#constant path to the database
 DB_PATH = "C:\\Users\\noahe\\PycharmProjects\\Assignment1_408\\venv\\StudentDB.sqlite"
 
 
@@ -15,30 +22,36 @@ def main():
               "\n5.) Search + Display Students by Category\n6.) Exit application"
     running = True
     db_helper = None
+    #attempt to establish connection with the DB
     try:
         db_helper = Helper(DB_PATH)
+    #prevent the application from running if connection is not established
     except Exception as e:
         print("!!!!Error connecting to database, aborting!!!!")
         running = False
 
     print(main_menu)
+    ##main loop
     while running:
         print(options)
         try:
             user_choice = int(input("Command:"))
             ###quits the app
-            if(user_choice==6):
+            if user_choice==6:
                 print("---Application Exited---")
                 break
-            elif(user_choice == 1):
+            #get all students
+            elif user_choice == 1:
                 result = db_helper.get_all_students()
                 res_df = DataFrame(result,columns = ["StudentId","First Name",
                                                      "Last Name","GPA","Major","Advisor"])
-                if(len(res_df) == 0):
+                #if results are empty (students not found)
+                if len(res_df) == 0:
                     print("!!!No Students to Display!!!")
                 else:
                     print(res_df)
-            elif(user_choice == 4):
+            #delete a student by ID
+            elif user_choice == 4:
                 try:
                     result = int(input("Enter the id number of the student to delete:>"))
                     worked = db_helper.delete_student(result)
@@ -48,6 +61,7 @@ def main():
                         print("A student with that ID was not found")
                 except ValueError:
                     print("!!!Ivalid input entered!!!")
+            #search for student by category
             elif user_choice == 5:
                 print("You can search students by entering\n"
                       "1 for GPA\n"
@@ -55,6 +69,7 @@ def main():
                       "3 for Faculty Advisor")
                 try:
                     user_choice = int(input("Enter your choice:>"))
+                    #to search student by advisor
                     if user_choice == 3:
                         advisor = input("Enter the advisor to search by:>")
                         result = db_helper.get_students_advisor(advisor)
@@ -64,6 +79,7 @@ def main():
                             print(df)
                         else:
                             print("---No student to display---")
+                    #to search student by major
                     elif user_choice == 2:
                         major = input("Enter the major to search by:>")
                         result = db_helper.get_students_major(major)
@@ -73,6 +89,7 @@ def main():
                             print(df)
                         else:
                             print("---No student to display---")
+                    #to search student by GPA
                     elif user_choice == 1:
                         try:
                             gpa = float(input("Enter the GPA value to match students:>"))
@@ -87,28 +104,33 @@ def main():
                             print("!!!Invalid GPA entered!!!")
                 except ValueError:
                     print("!!!Invalid choice entered")
-
-            elif(user_choice == 2):
+            #create new student record
+            #nested ifs to provide feedback to user if invalid information entered
+            #checker is used to ensure that the names names and major have pure text and no numbers or random characters
+            elif user_choice == 2:
                 first_name = input("Enter the student's first name:>")
-                if(Checker.is_pure_text(first_name)):
+                if Checker.is_pure_text(first_name):
                     last_name = input("Enter the student's last name:>")
-                    if(Checker.is_pure_text(last_name)):
+                    if Checker.is_pure_text(last_name):
                         try:
                             gpa = float(input("Enter the student's GPA:>"))
-                            major = input("Enter the student's major:>")
-                            if(Checker.is_pure_text(major)):
-                                advisor = input("Enter the name of the student's advisor:")
-                                if(Checker.is_pure_text(advisor)):
-                                    try:
-                                        new_stud = Student(first_name,last_name,gpa,major,advisor)
-                                        db_helper.write_new_student(new_stud.get_tuple())
-                                        print("---New Student Successfully Added--")
-                                    except:
-                                        print("Error adding student to database")
+                            if gpa >= 0 and gpa <=4.0:
+                                major = input("Enter the student's major:>")
+                                if Checker.is_pure_text(major):
+                                    advisor = input("Enter the name of the student's advisor:")
+                                    if Checker.is_pure_text(advisor):
+                                        try:
+                                            new_stud = Student(first_name,last_name,gpa,major,advisor)
+                                            db_helper.write_new_student(new_stud.get_tuple())
+                                            print("---New Student Successfully Added--")
+                                        except:
+                                            print("Error adding student to database")
+                                    else:
+                                        print("!!!Invalid advisor entered!!!")
                                 else:
-                                    print("!!!Invalid advisor entered!!!")
+                                    print("!!!Invalid major entered!!!")
                             else:
-                                print("!!!Invalid major entered!!!")
+                                print("!!!Invalid GPA entered!!!")
                         except:
                             print("!!!Invalid GPA entered!!!")
                     else:
@@ -116,8 +138,9 @@ def main():
 
                 else:
                     print("!!!Invalid first name entered!!!")
-
-            elif(user_choice == 3):
+            #allows student record to be editted
+            #nested ifs to provide user feedback to their invalid input
+            elif user_choice == 3:
                 try:
                     choice = int(input("You can either edit a student's Major or Advisor:\n"
                                      "Enter 1 for Major or 2 for Advisor\nCommand:>"))
