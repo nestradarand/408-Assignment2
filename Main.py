@@ -11,7 +11,7 @@ Accounts for invalid inputs and commands.
 '''
 
 #constant path to the database
-DB_PATH = "C:\\Users\\noahe\\PycharmProjects\\Assignment1_408\\venv\\StudentDB.sqlite"
+DB_PATH = ".\\StudentDB.sqlite"
 
 
 
@@ -72,13 +72,16 @@ def main():
                     #to search student by advisor
                     if user_choice == 3:
                         advisor = input("Enter the advisor to search by:>")
-                        result = db_helper.get_students_advisor(advisor)
-                        if result:
-                            df = DataFrame(result,columns = ["StudentId","First Name",
-                                                     "Last Name","GPA","Major","Advisor"])
-                            print(df)
-                        else:
-                            print("---No student to display---")
+                        try:
+                            result = db_helper.get_students_advisor(advisor)
+                            if result:
+                                df = DataFrame(result,columns = ["StudentId","First Name",
+                                                         "Last Name","GPA","Major","Advisor"])
+                                print(df)
+                            else:
+                                print("---No student to display---")
+                        except:
+                            print("--No student found for that advisor---5")
                     #to search student by major
                     elif user_choice == 2:
                         major = input("Enter the major to search by:>")
