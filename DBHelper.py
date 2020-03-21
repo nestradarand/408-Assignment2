@@ -105,3 +105,15 @@ class Helper:
             return results
         except:
             return None
+    def id_exists(self,new_id:int) -> bool:
+        new_tuple = (new_id,)
+        try:
+            results = self.c.execute("SELECT FirstName "
+                                     "FROM StudentDB "
+                                     "WHERE StudentId= ?",new_tuple)
+            results = results.fetchall()
+            if len(results) < 1:
+                return False
+            return True
+        except:
+            return False

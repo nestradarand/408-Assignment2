@@ -53,12 +53,13 @@ def main():
             #delete a student by ID
             elif user_choice == 4:
                 try:
-                    result = int(input("Enter the id number of the student to delete:>"))
-                    worked = db_helper.delete_student(result)
-                    if(worked):
-                        print("Student successfully removed.")
+                    id = int(input("Enter the id number of the student to delete:>"))
+                    if db_helper.id_exists(id):
+                        worked = db_helper.delete_student(id)
+                        if(worked):
+                            print("Student successfully removed.")
                     else:
-                        print("A student with that ID was not found")
+                        print("!!!A student with that ID was not found!!!")
                 except ValueError:
                     print("!!!Ivalid input entered!!!")
             #search for student by category
